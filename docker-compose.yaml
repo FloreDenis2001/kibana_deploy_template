@@ -140,3 +140,31 @@ services:
         echo "All done!";
     networks:
       - mynet
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - prometheus_data:/prometheus
+    environment:
+      PROMETHEUS_CONFIG: |
+        global:
+          scrape_interval: 15s
+        scrape_configs:
+          - job_name: 'spring-boot-apps'
+            metrics_path: '/actuator/prometheus'
+            scrape_interval: 5s
+            static_configs:
+              - targets:
+                  - 'service:3100'
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        echo "$${PROMETHEUS_CONFIG}" > /etc/prometheus/prometheus.yml
+        /bin/prometheus --config.file=/etc/prometheus/prometheus.yml
+    ports:
+      - '9090:9090'
+    depends_on:
+      - service
+    networks:
+      - myappnetwork

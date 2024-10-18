@@ -13,6 +13,8 @@ EXPOSE 3000
 COPY mvnw .
 COPY .mvn .mvn
 
+# Asigură-te că mvnw are permisiuni de execuție
+RUN chmod +x mvnw
 
 # Copy the pom.xml file to download dependencies
 COPY pom.xml .

@@ -3,7 +3,7 @@
 
 
     <!-- Define the service name -->
-    <property name="SERVICE_NAME" value="auth-service"/>
+    <property name="SERVICE_NAME" value="kibana_deploy_template"/>
 
     <!-- Define the Logstash destination with a default -->
     <springProperty name="LOGSTASH_DESTINATION" source="logs.destination"/>

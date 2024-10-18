@@ -1,30 +1,23 @@
-version: '3.8'
-
 networks:
-  myappnetwork:
+  mynet:
     driver: bridge
 
 volumes:
-  volume_data:
-    driver: local
+  db_data:
   kibana_data:
   es_data:
   logstash_pipeline:
-  prometheus_data:
-  grafana_data:
-  grafana_provisioning:
-    driver: local
 
 x-variables:
-  elastic_password: &elastic_password 'passwOrd'
-  kibana_password: &kibana_password 'passwOrd'
+  elastic_password: &elastic_password 'parola'
+  kibana_password: &kibana_password 'parola'
 
 services:
   mysql:
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: userskibana_db
+      MYSQL_DATABASE: courses_db
     networks:
       - mynet
     ports:
@@ -32,36 +25,33 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
-      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
       timeout: 20s
       retries: 1
-
-  service:
-    container_name: kibana-deploy-template
-    image: "floredenis2001/kibana-deploy-template:latest"
-    ports:
-      - "3100:3100"
-    restart: always
+  kibana-deploy-template:
+    image: floredenis2001/kibana-deploy-template:latest
+    networks:
+      - mynet
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
     depends_on:
       - mysql
-    networks:
-      - myappnetwork
+      - zipkin
+
 
   zipkin:
     image: openzipkin/zipkin
     container_name: zipkin
     networks:
-      - myappnetwork
+      - mynet
     ports:
       - "9411:9411"
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:9411/health || exit 1"]
+      test: [ "CMD-SHELL", "curl -f http://localhost:9411/health || exit 1" ]
       interval: 30s
       timeout: 10s
-      retries: 5
-
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.1
     container_name: elasticsearch
@@ -71,10 +61,10 @@ services:
       cluster.name: 'elasticsearch'
       bootstrap.memory_lock: 'true'
       ES_JAVA_OPTS: '-Xms1g -Xmx1g'
-      xpack.security.enabled: 'true'
+      xpack.security.enabled: 'false'
       xpack.security.http.ssl.enabled: 'false'
     networks:
-      - myappnetwork
+      - mynet
     ports:
       - "9200:9200"
     ulimits:
@@ -88,7 +78,6 @@ services:
       retries: 5
     volumes:
       - es_data:/usr/share/elasticsearch/data
-
   kibana:
     image: docker.elastic.co/kibana/kibana:8.12.1
     container_name: kibana
@@ -97,24 +86,26 @@ services:
       ELASTICSEARCH_USERNAME: 'kibana_system'
       ELASTICSEARCH_PASSWORD: *kibana_password
       TELEMETRY_ENABLED: 'false'
+      bootstrap.memory_lock: 'true'
+
     networks:
-      - myappnetwork
+      - mynet
     ports:
       - '5601:5601'
     depends_on:
       - elasticsearch
     volumes:
       - kibana_data:/usr/share/kibana/data
-
   logstash:
     image: docker.elastic.co/logstash/logstash:8.12.1
     container_name: logstash
     environment:
       ELASTIC_PASSWORD: *elastic_password
+      bootstrap.memory_lock: 'true'
       CONFIG_STRING: |
         input {
           tcp {
-            port => 3000
+            port => 3100
             codec => json_lines
           }
         }
@@ -127,18 +118,19 @@ services:
           }
         }
     networks:
-      - myappnetwork
+      - mynet
     ports:
-      - "3000:3000"
+      - "3100:3100"
     depends_on:
       - elasticsearch
-
   setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.1
     container_name: setup
     environment:
       ELASTIC_PASSWORD: *elastic_password
       KIBANA_PASSWORD: *kibana_password
+      bootstrap.memory_lock: 'true'
+
     command:
       - bash
       - -c
@@ -151,67 +143,4 @@ services:
           -d "{\"password\":\"$${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
         echo "All done!";
     networks:
-      - myappnetwork
-
-#  prometheus:
-#    image: prom/prometheus:latest
-#    container_name: prometheus
-#    volumes:
-#      - prometheus_data:/prometheus
-#    environment:
-#      PROMETHEUS_CONFIG: |
-#        global:
-#          scrape_interval: 15s
-#        scrape_configs:
-#          - job_name: 'spring-boot-apps'
-#            metrics_path: '/actuator/prometheus'
-#            scrape_interval: 5s
-#            static_configs:
-#              - targets:
-#                  - 'service:3100'
-#    entrypoint:
-#      - /bin/sh
-#      - -c
-#      - |
-#        echo "$${PROMETHEUS_CONFIG}" > /etc/prometheus/prometheus.yml
-#        /bin/prometheus --config.file=/etc/prometheus/prometheus.yml
-#    ports:
-#      - '9090:9090'
-#    depends_on:
-#      - service
-#    networks:
-#      - myappnetwork
-
-#  grafana:
-#    image: grafana/grafana:latest
-#    container_name: grafana
-#    ports:
-#      - "3200:3000"
-#    environment:
-#      - GF_SECURITY_ADMIN_PASSWORD=secret
-#    depends_on:
-#      - prometheus
-#    networks:
-#      - myappnetwork
-#    volumes:
-#      - grafana_data:/var/lib/grafana
-#      - grafana_provisioning:/etc/grafana/provisioning
-#    entrypoint:
-#      - /bin/sh
-#      - -c
-#      - |
-#        mkdir -p /etc/grafana/provisioning/datasources
-#        mkdir -p /etc/grafana/provisioning/dashboards
-#        echo '
-#        apiVersion: 1
-#
-#        datasources:
-#          - name: Prometheus
-#            type: prometheus
-#            access: proxy
-#            isDefault: true
-#            url: http://prometheus:9090
-#            version: 1
-#            editable: false
-#        ' > /etc/grafana/provisioning/datasources/datasource.yml
-#        /run.sh
+      - mynet

@@ -37,6 +37,8 @@ metrics:
       http:
         server:
           request: true
+
+
 management:
   tracing:
     sampling:
@@ -51,5 +53,20 @@ management:
   endpoint:
       prometheus:
         enabled: true
+
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+
+  logging:
+    pattern:
+      level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
+    level:
+      root: debug
+    file:
+      name: test.log
 logs:
   destination: localhost:3100

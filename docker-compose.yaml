@@ -8,9 +8,7 @@ volumes:
   es_data:
   logstash_pipeline:
 
-x-variables:
-  elastic_password: &elastic_password 'parola'
-  kibana_password: &kibana_password 'parola'
+
 
 services:
   mysql:
@@ -29,7 +27,7 @@ services:
       timeout: 20s
       retries: 1
   kibana-deploy-template:
-    image: floredenis2001/kibana-deploy-template:latest
+    image: floredenis2001/kibana-deploy-template:18.10.2024.17.41.46
     networks:
       - mynet
     environment:
@@ -56,12 +54,12 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.1
     container_name: elasticsearch
     environment:
-      ELASTIC_PASSWORD: *elastic_password
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
       discovery.type: 'single-node'
       cluster.name: 'elasticsearch'
       bootstrap.memory_lock: 'true'
       ES_JAVA_OPTS: '-Xms1g -Xmx1g'
-      xpack.security.enabled: 'false'
+      xpack.security.enabled: 'true'
       xpack.security.http.ssl.enabled: 'false'
     networks:
       - mynet
@@ -84,10 +82,8 @@ services:
     environment:
       ELASTICSEARCH_HOSTS: 'http://elasticsearch:9200'
       ELASTICSEARCH_USERNAME: 'kibana_system'
-      ELASTICSEARCH_PASSWORD: *kibana_password
+      ELASTICSEARCH_PASSWORD: ${KIBANA_PASSWORD}
       TELEMETRY_ENABLED: 'false'
-      bootstrap.memory_lock: 'true'
-
     networks:
       - mynet
     ports:
@@ -100,7 +96,7 @@ services:
     image: docker.elastic.co/logstash/logstash:8.12.1
     container_name: logstash
     environment:
-      ELASTIC_PASSWORD: *elastic_password
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
       bootstrap.memory_lock: 'true'
       CONFIG_STRING: |
         input {
@@ -127,8 +123,8 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.1
     container_name: setup
     environment:
-      ELASTIC_PASSWORD: *elastic_password
-      KIBANA_PASSWORD: *kibana_password
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      KIBANA_PASSWORD: ${KIBANA_PASSWORD}
       bootstrap.memory_lock: 'true'
 
     command:

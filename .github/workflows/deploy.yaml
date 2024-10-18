@@ -30,7 +30,7 @@ jobs:
         run: |
           chmod +x ci/build-publish.sh
           USERNAME=floredenis2001 \
-          REPO=kibana_deploy_template \
+          REPO=kibana-deploy-template \
           TAG=${{ env.BUILD_NUMBER }} \
           ci/build-publish.sh ./
 

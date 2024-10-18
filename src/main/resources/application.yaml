@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: kibana-deploy-template
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+    show-sql: true
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/userskibana_db?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&createDatabaseIfNotExist=true
+    username: root
+    password: Decembrie2001
+
+
+springdoc:
+  swagger-ui:
+    enabled: true
+  api-docs:
+    enabled: true
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
+  port: 8080
+
+logging:
+  level:
+    org.springframework.cloud.sleuth: DEBUG
+    org.springframework.web.client.RestTemplat: DEBUG
+metrics:
+  distribution:
+    percentiles-histogram:
+      http:
+        server:
+          request: true
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+logs:
+  destination: localhost:3100

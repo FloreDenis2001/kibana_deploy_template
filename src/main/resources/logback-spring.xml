@@ -116,7 +116,9 @@
                 </logstashMarkers>
                 <mdc>
                     <fieldName>mdc</fieldName>
-                    <includeMdcKeyName>*</includeMdcKeyName>
+                    <includeMdcKeyName>traceId</includeMdcKeyName>
+                    <includeMdcKeyName>spanId</includeMdcKeyName>
+                    <includeMdcKeyName>userId</includeMdcKeyName>
                 </mdc>
                 <arguments>
                     <fieldName>args</fieldName>

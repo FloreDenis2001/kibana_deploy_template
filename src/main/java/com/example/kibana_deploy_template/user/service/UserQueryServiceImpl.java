@@ -8,21 +8,21 @@ import com.example.kibana_deploy_template.user.system.logs.LogAction;
 import com.example.kibana_deploy_template.user.system.logs.LogMessage;
 import com.example.kibana_deploy_template.user.system.logs.LogStatus;
 import com.example.kibana_deploy_template.user.system.logs.StructuredLogger;
+import lombok.AllArgsConstructor;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@AllArgsConstructor
 @Service
 public class UserQueryServiceImpl implements UserQueryService {
 
     private final UserRepo userRepo;
-    private final StructuredLogger logger = new StructuredLogger(LoggerFactory.getLogger(UserQueryServiceImpl.class));
+    private final StructuredLogger logger;
 
-    public UserQueryServiceImpl(UserRepo userRepo) {
-        this.userRepo = userRepo;
-    }
+
 
     @Override
     public Optional<User> findByEmail(String email) {

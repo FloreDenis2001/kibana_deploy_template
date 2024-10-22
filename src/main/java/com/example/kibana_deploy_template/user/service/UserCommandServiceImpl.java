@@ -10,6 +10,7 @@ import com.example.kibana_deploy_template.user.system.logs.LogAction;
 import com.example.kibana_deploy_template.user.system.logs.LogMessage;
 import com.example.kibana_deploy_template.user.system.logs.LogStatus;
 import com.example.kibana_deploy_template.user.system.logs.StructuredLogger;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -22,15 +23,11 @@ import java.util.Optional;
 @Service
 @Transactional
 @Slf4j
+@AllArgsConstructor
 public class UserCommandServiceImpl implements UserCommandService {
 
     private final UserRepo userRepo;
-
-    public UserCommandServiceImpl(UserRepo userRepo) {
-        this.userRepo = userRepo;
-    }
-    private final StructuredLogger logger = new StructuredLogger(LoggerFactory.getLogger(UserCommandServiceImpl.class));
-
+    private final StructuredLogger logger ;
 
     @Override
     public CreateUserReponse createUser(CreateUserRequest createUserRequest) {

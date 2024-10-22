@@ -26,7 +26,7 @@ public class UserControllerService {
 
     private final UserCommandServiceImpl userCommandService;
     private final UserQueryServiceImpl userQueryService;
-    private final StructuredLogger logger = new StructuredLogger(LoggerFactory.getLogger(UserControllerService.class));
+    private final StructuredLogger logger;
 
     @PostMapping
     public ResponseEntity<CreateUserReponse> createUser(@RequestBody CreateUserRequest createUserRequest) {

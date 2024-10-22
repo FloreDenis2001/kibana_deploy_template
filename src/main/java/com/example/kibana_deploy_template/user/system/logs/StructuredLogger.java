@@ -1,19 +1,23 @@
 package com.example.kibana_deploy_template.user.system.logs;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import net.logstash.logback.marker.LogstashMarker;
 import net.logstash.logback.marker.Markers;
+import org.springframework.stereotype.Component;
+
 import java.util.Map;
 
 
 
 import java.util.HashMap;
 
+@Slf4j
+@Component
 public class StructuredLogger {
 
-    private final Logger logger;
 
-    public StructuredLogger(Logger logger) {
-        this.logger = logger;
+  Logger logger;
+    public StructuredLogger() {
     }
 
     public LogBuilder logBuilder() {

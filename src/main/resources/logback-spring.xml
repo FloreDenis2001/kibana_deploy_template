@@ -93,44 +93,26 @@
 
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
         <destination>${LOGSTASH_DESTINATION}</destination>
-        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-            <providers>
-                <timestamp>
-                    <fieldName>timestamp</fieldName>
-                    <pattern>yyyy-MM-dd HH:mm:ss.SSS</pattern>
-                </timestamp>
-                <threadName>
-                    <fieldName>thread</fieldName>
-                </threadName>
-                <logLevel>
-                    <fieldName>level</fieldName>
-                </logLevel>
-                <loggerName>
-                    <fieldName>logger</fieldName>
-                </loggerName>
-                <message>
-                    <fieldName>message</fieldName>
-                </message>
-                <logstashMarkers/>
-                <mdc>
-                    <fieldName>mdc</fieldName>
-                    <includeMdcKeyName>traceId</includeMdcKeyName>
-                    <includeMdcKeyName>spanId</includeMdcKeyName>
-                    <includeMdcKeyName>userId</includeMdcKeyName>
-                </mdc>
-                <arguments>
-                    <fieldName>args</fieldName>
-                </arguments>
-                <pattern>
-                    <pattern>
-                        {
-                        "serviceName": "${SERVICE_NAME}"
-                        }
-                    </pattern>
-                </pattern>
-            </providers>
+        <includeCallerData>true</includeCallerData>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <fieldNames>
+                <timestamp>timestamp</timestamp>
+                <version>version</version>
+                <level>level</level>
+                <thread>thread</thread>
+                <logger>logger</logger>
+                <message>message</message>
+                <context>context</context>
+                <mdc>mdc</mdc>
+                <tags>tags</tags>
+                <fields>fields</fields>
+                <stackTrace>stackTrace</stackTrace>
+            </fieldNames>
+            <customFields>{"serviceName": "${SERVICE_NAME}"}</customFields>
         </encoder>
     </appender>
+
+
 
     <root level="info">
         <appender-ref ref="ROLLING"/>

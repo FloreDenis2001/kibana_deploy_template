@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="30 seconds">
 
+    <property name="SERVICE_NAME" value="${SERVICE_NAME:-kibana_deploy_template}"/>
 
-    <!-- Define the service name -->
-    <property name="SERVICE_NAME" value="kibana_deploy_template"/>
+    <springProperty name="LOGSTASH_DESTINATION" source="logs.destination" defaultValue="localhost:5044"/>
 
-    <!-- Define the Logstash destination with a default -->
-    <springProperty name="LOGSTASH_DESTINATION" source="logs.destination"/>
-
-    <!-- Rolling File Appender -->
     <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>./logs/server.log</file>
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <providers>
                 <timestamp>
                     <fieldName>timestamp</fieldName>
-                    <pattern>yyyy-MM-dd HH:mm:ss</pattern>
+                    <pattern>yyyy-MM-dd HH:mm:ss.SSS</pattern>
                 </timestamp>
                 <threadName>
                     <fieldName>thread</fieldName>
@@ -29,11 +25,12 @@
                 <message>
                     <fieldName>message</fieldName>
                 </message>
+                <logstashMarkers>
+                    <fieldName>markers</fieldName>
+                </logstashMarkers>
                 <mdc>
                     <fieldName>mdc</fieldName>
-                    <includeMdcKeyName>traceId</includeMdcKeyName>
-                    <includeMdcKeyName>spanId</includeMdcKeyName>
-                    <includeMdcKeyName>userId</includeMdcKeyName>
+                    <includeMdcKeyName>*</includeMdcKeyName>
                 </mdc>
                 <arguments>
                     <fieldName>args</fieldName>
@@ -54,13 +51,12 @@
         </rollingPolicy>
     </appender>
 
-    <!-- Console Appender -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <providers>
                 <timestamp>
                     <fieldName>timestamp</fieldName>
-                    <pattern>yyyy-MM-dd HH:mm:ss</pattern>
+                    <pattern>yyyy-MM-dd HH:mm:ss.SSS</pattern>
                 </timestamp>
                 <threadName>
                     <fieldName>thread</fieldName>
@@ -95,7 +91,6 @@
         </encoder>
     </appender>
 
-    <!-- Logstash Appender -->
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
         <destination>${LOGSTASH_DESTINATION}</destination>
         <includeCallerData>true</includeCallerData>
@@ -117,8 +112,9 @@
         </encoder>
     </appender>
 
-    <!-- Root Logger -->
-    <root level="debug">
+
+
+    <root level="info">
         <appender-ref ref="ROLLING"/>
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="LOGSTASH"/>

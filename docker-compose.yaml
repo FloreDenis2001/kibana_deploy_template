@@ -30,7 +30,7 @@ services:
       timeout: 20s
       retries: 1
   kibana-deploy-template:
-    image: floredenis2001/kibana-deploy-template:18.10.2024.17.41.46
+    image: floredenis2001/kibana-deploy-template:latest
     networks:
       - mynet
     environment:

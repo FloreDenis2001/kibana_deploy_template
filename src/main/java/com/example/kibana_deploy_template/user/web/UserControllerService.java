@@ -6,12 +6,11 @@ import com.example.kibana_deploy_template.user.dtos.UpdateUserResponse;
 import com.example.kibana_deploy_template.user.model.User;
 import com.example.kibana_deploy_template.user.service.UserCommandServiceImpl;
 import com.example.kibana_deploy_template.user.service.UserQueryServiceImpl;
-import com.example.kibana_deploy_template.user.system.logs.StructuredLogger;
 import com.example.kibana_deploy_template.user.system.logs.LogAction;
 import com.example.kibana_deploy_template.user.system.logs.LogStatus;
 import com.example.kibana_deploy_template.user.system.logs.LogMessage;
+import com.example.kibana_deploy_template.user.utils.StructuredLogger;
 import lombok.AllArgsConstructor;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

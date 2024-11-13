@@ -7,9 +7,8 @@ import com.example.kibana_deploy_template.user.repository.UserRepo;
 import com.example.kibana_deploy_template.user.system.logs.LogAction;
 import com.example.kibana_deploy_template.user.system.logs.LogMessage;
 import com.example.kibana_deploy_template.user.system.logs.LogStatus;
-import com.example.kibana_deploy_template.user.system.logs.StructuredLogger;
+import com.example.kibana_deploy_template.user.utils.StructuredLogger;
 import lombok.AllArgsConstructor;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
